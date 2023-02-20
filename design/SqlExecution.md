@@ -90,6 +90,46 @@ Job 由物理计划生成。一个 Job 包含若干个 Task, 每个 Task 都有�
 
 每个 Task 又由若干个 Operator 组成，每个 Operator 有一个或多个输入端口，称为 Pin, 用从 0 开始的编号表示；Operator 还有 Outputs 属性，表示所有输出端口，是 一个 Output 的列表。Outputs 可以包含零到多个 Output, 每个 Output 标明它连接到的下一级 Operator 的 ID 和 Pin 编号，由此形成有向无环图。
 
+下图是 Job 和 Task 的类图（部分）
+
+```mermaid
+classDiagram
+
+class Job {
+    +id
+    +getTasks()
+}
+
+class Task {
+    +id
+    +location
+    +getOperators()
+}
+
+class Operator {
+    +id
+    +push()
+    +fin()
+    +getOutputs()
+}
+
+class Output {
+    +operatorId
+    +pin
+    +push()
+    +fin()
+}
+
+Job o-- "1..*" Task
+Task o-- "1..*" Operator
+Operator o-- "0..*" Output
+Output .. Operator: point to
+Operator <|-- SourceOperator
+SourceOperator <|-- Scan
+Operator <|-- Project
+Operator <|-- Root
+```
+
 Task 采用“推数据”的方式运行。一般来说，Operator 的 `push` 方法表示有数据输入到它的一个端口。Operator 处理完数据之后可以直接调用 Output 的 `push` 方法输出数据，而 Output 则直接调用下一级 Operator 的 `push` 方法。
 
 有些 Operator 不需要输入数据，称为 Source Operator, 此时它的 `push` 方法作为启动 Task 运行的入口。Task 启动执行时，需要并行调用每个 Source Operator 的 `push` 方法。
