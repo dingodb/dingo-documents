@@ -1,7 +1,7 @@
 # Documents about DingoDB
 
 
-本项目主要提供DingoDB相关的设计文档、接口文档、版本等技术文档。
+本项目主要提供DingoDB相关的设计文档、接口文档、版本说明等技术文档。
 
 
 
